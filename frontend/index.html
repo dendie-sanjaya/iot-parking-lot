@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Status Parkir IoT</title>
+    <!-- Memuat Tailwind CSS untuk styling cepat dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Menggunakan font Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+    </style>
+</head>
+<body class="bg-gray-50 font-sans p-4 sm:p-8">
+    
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-blue-800 tracking-tight">Status Slot Parkir IoT</h1>
+            <p class="text-gray-600 mt-1">Data diperbarui dari layanan API (Port 3000)</p>
+        </header>
+
+        <!-- Summary Cards -->
+        <div id="summary-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Slots -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-blue-500">
+                <p class="text-sm font-medium text-gray-500">Total Slot</p>
+                <p id="total-slots" class="text-4xl font-bold text-blue-800 mt-1">--</p>
+            </div>
+            <!-- Total Available -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-green-500">
+                <p class="text-sm font-medium text-gray-500">Tersedia (Kosong)</p>
+                <p id="total-available" class="text-4xl font-bold text-green-600 mt-1">--</p>
+            </div>
+            <!-- Total Occupied -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-red-500">
+                <p class="text-sm font-medium text-gray-500">Terisi</p>
+                <p id="total-occupied" class="text-4xl font-bold text-red-600 mt-1">--</p>
+            </div>
+        </div>
+
+        <!-- Slot Table -->
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+            <h2 class="text-xl font-semibold p-6 border-b text-gray-700">Detail Slot Parkir</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slot Kode</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last In</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Out</th>
+                        </tr>
+                    </thead>
+                    <tbody id="slots-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Data will be inserted here by JavaScript -->
+                        <tr><td colspan="4" class="text-center py-4 text-gray-500">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Last Update Timestamp -->
+        <div class="text-center mt-6 text-sm text-gray-500">
+            Terakhir Diperbarui: <span id="last-updated">N/A</span>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://192.168.100.35:3000/api/slots';
+        
+        // Helper function untuk format waktu
+        function formatDateTime(isoString) {
+            if (!isoString || isoString === 'N/A') return 'N/A';
+            const date = new Date(isoString);
+            return date.toLocaleString('id-ID', { 
+                year: 'numeric', month: 'short', day: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            });
+        }
+
+        async function fetchParkingData() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // 1. Update Summary Cards
+                document.getElementById('total-slots').textContent = data.total_slots;
+                document.getElementById('total-available').textContent = data.total_available;
+                document.getElementById('total-occupied').textContent = data.total_occupied;
+
+                // 2. Update Table
+                const tableBody = document.getElementById('slots-table-body');
+                tableBody.innerHTML = ''; // Bersihkan konten lama
+
+                if (data.slots.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Tidak ada data slot parkir.</td></tr>';
+                    return;
+                }
+
+                data.slots.forEach(slot => {
+                    const statusColor = slot.status === 1 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${slot.slot_kode}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
+                                ${slot.status_text}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDateTime(slot.last_in)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDateTime(slot.last_out)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // 3. Update Timestamp
+                document.getElementById('last-updated').textContent = formatDateTime(new Date().toISOString());
+
+            } catch (error) {
+                console.error('Gagal mengambil data parkir:', error);
+                document.getElementById('slots-table-body').innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Error: Gagal koneksi ke API Server. Pastikan app.js berjalan.</td></tr>';
+            }
+        }
+
+        // Jalankan fetch pertama kali dan ulangi setiap 3 detik
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchParkingData();
+            // Pembaruan data otomatis
+            setInterval(fetchParkingData, 3000); 
+        });
+    </script>
+</body>
+</html>
