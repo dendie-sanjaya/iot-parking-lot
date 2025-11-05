@@ -7,7 +7,6 @@ This project provides an IoT Smart Parking solution to fix this. It uses an ESP8
 This status is then instantly sent using the efficient MQTT Protocol to a central server and a Frontend Dashboard. By giving users and operators immediate, accurate visibility of slot availability, the system aims to significantly reduce parking search time and optimize the overall use of the parking area.
 
 
-
 ### **Table of Contents**
 
 1.  [Project Overview](https://github.com/dendie-sanjaya/iot-parking-lot#1--project-overview)
@@ -39,14 +38,13 @@ This document serves as a complete guide, covering the architecture, hardware se
 
 
 | Feature | Component/Technology | Role in the System |
-| : | : | : |
+| :--- | :--- | :--- |
 | **Object Sensing** | HC-SR04 Ultrasonic Sensor | **Detects** if a parking slot is **Occupied** (car present) or **Empty** (car absent). |
 | **Edge Computing** | ESP8266 Microcontroller | **Processes** sensor data, **Controls** local outputs (LEDs/OLED), and manages **Wi-Fi/MQTT** communication. |
 | **Local Status** | LED Lamp (Red/Green) & OLED Display | Provides immediate, local **visual feedback** to the user at the parking slot. |
 | **Cloud Communication** | MQTT Protocol (Pub/Sub) | Enables lightweight, **real-time data transmission** of the parking status to the central server. |
 | **Backend Data** | SQL Database, Node JS with RESTful API | **Stores** the latest status (`Info Status Slot Parkir`) and serves data to the Frontend Dashboard. |
 | **User Interface** | Frontend Dashboard (HTML/JS) | **Monitors** and visualizes the parking slot status centrally in a web browser. |
-
 
 
 ### **3. System Architecture (Overall Design)**
@@ -189,6 +187,6 @@ The server log confirms that the backend listener successfully received the mess
 
 For a complete, real-time demonstration of the system in action, including the moment a car is detected and the dashboard updates, please watch the following video:
 
-[!Youtube IoT Smart Parking Simulation Video](https://www.youtube.com/shorts/WS5VSQtktnw) atau bisa dowload di  [Download video MP4](video/video.mp4)
+[Youtube IoT Smart Parking Simulation Video](https://www.youtube.com/shorts/WS5VSQtktnw) atau bisa dowload di  [Download video MP4](video/video.mp4)
 
 
