@@ -76,7 +76,7 @@ The following diagram details the pin connections for the ESP8266, sensor, and o
 ![Wiring Diagram](design/pin-wired.png)
 
 | Component | Pin Function | ESP8266 Pin (NodeMCU) | Notes |
-| : | : | : | : |
+| :--- | :--- | :--- | :--- |
 | **HC-SR04 (Sensor)** | Trigger Pin (Output) | **D1 (GPIO 5)** | Output pulse for distance measurement. |
 | **HC-SR04 (Sensor)** | Echo Pin (Input) | **D2 (GPIO 4)** | Input pulse for distance calculation. |
 | **OLED Display** | SCL (Clock) | **D3 (GPIO 0)** | I2C Communication for display. |
@@ -84,7 +84,6 @@ The following diagram details the pin connections for the ESP8266, sensor, and o
 | **Red Lamp Module** | Control Pin | **D5 (GPIO 14)** | Active HIGH/LOW to indicate 'Occupied'. |
 | **Green Lamp Module** | Control Pin | **D6 (GPIO 12)** | Active HIGH/LOW to indicate 'Empty'. |
 | **Power** | Input | **DV 5V 1A (USB)** | Powers the ESP8266 and all connected components. |
-
 
 
 ### **5. Software Setup and Configuration**
