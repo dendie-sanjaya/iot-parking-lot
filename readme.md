@@ -1,4 +1,4 @@
-## Internet of Things (IoT) Smart Parking System 
+# Internet of Things (IoT) Smart Parking System 
 
 The primary problem in modern cities is inefficient parking management due to a lack of real-time information, which causes traffic congestion, wasted fuel, and stress for drivers searching for open spots.
 
