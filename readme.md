@@ -1,9 +1,10 @@
+## Internet of Things (IoT) Smart Parking System 
 
 The primary problem in modern cities is inefficient parking management due to a lack of real-time information, which causes traffic congestion, wasted fuel, and stress for drivers searching for open spots.
 
- This project provides an IoT Smart Parking solution to fix this. It uses an ESP8266 and an Ultrasonic Sensor (HC-SR04) to automatically detect if a parking slot is occupied or empty. 
+This project provides an IoT Smart Parking solution to fix this. It uses an ESP8266 and an Ultrasonic Sensor (HC-SR04) to automatically detect if a parking slot is occupied or empty. 
  
- This status is then instantly sent using the efficient MQTT Protocol to a central server and a Frontend Dashboard. By giving users and operators immediate, accurate visibility of slot availability, the system aims to significantly reduce parking search time and optimize the overall use of the parking area.
+This status is then instantly sent using the efficient MQTT Protocol to a central server and a Frontend Dashboard. By giving users and operators immediate, accurate visibility of slot availability, the system aims to significantly reduce parking search time and optimize the overall use of the parking area.
 
 ### **Table of Contents**
 
