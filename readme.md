@@ -6,7 +6,7 @@ This project provides an IoT Smart Parking solution to fix this. It uses an ESP8
  
 This status is then instantly sent using the efficient MQTT Protocol to a central server and a Frontend Dashboard. By giving users and operators immediate, accurate visibility of slot availability, the system aims to significantly reduce parking search time and optimize the overall use of the parking area.
 
----
+
 
 ### **Table of Contents**
 
@@ -26,20 +26,20 @@ This status is then instantly sent using the efficient MQTT Protocol to a centra
 7.  [Video Documentation](https://github.com/dendie-sanjaya/iot-parking-lot#7--video-documentation)
 8.  [License](https://github.com/dendie-sanjaya/iot-parking-lot#8--license)
 
----
+
 
 ### **1. Project Overview**
----
+
 
 This project is a detailed simulation of an **Internet of Things (IoT) Smart Parking System** designed to monitor a single parking slot's availability in real-time. It uses the **ESP8266** microcontroller, an **Ultrasonic Sensor (HC-SR04)**, and the **MQTT Protocol** to send status data to a custom-built **Frontend Dashboard**.
 
 This document serves as a complete guide, covering the architecture, hardware setup, software configuration, and a showcase of the running application.
 
 ### **2. Key Features and Technologies**
----
+
 
 | Feature | Component/Technology | Role in the System |
-| :--- | :--- | :--- |
+| : | : | : |
 | **Object Sensing** | HC-SR04 Ultrasonic Sensor | **Detects** if a parking slot is **Occupied** (car present) or **Empty** (car absent). |
 | **Edge Computing** | ESP8266 Microcontroller | **Processes** sensor data, **Controls** local outputs (LEDs/OLED), and manages **Wi-Fi/MQTT** communication. |
 | **Local Status** | LED Lamp (Red/Green) & OLED Display | Provides immediate, local **visual feedback** to the user at the parking slot. |
@@ -51,7 +51,7 @@ This document serves as a complete guide, covering the architecture, hardware se
 
 ### **3. System Architecture (Overall Design)**
 
----
+
 The system is based on a tiered IoT architecture, defining a clear data flow path from the physical environment to the user interface.
 
 
@@ -69,7 +69,7 @@ The block diagram below illustrates the three main layers: Micro Controller, Int
 
 
 ### **4. Hardware Components and Wiring**
----
+
 The following diagram details the pin connections for the ESP8266, sensor, and output modules.
 
 
@@ -78,7 +78,7 @@ The following diagram details the pin connections for the ESP8266, sensor, and o
 ![Wiring Diagram](design/pin-wired.png)
 
 | Component | Pin Function | ESP8266 Pin (NodeMCU) | Notes |
-| :--- | :--- | :--- | :--- |
+| : | : | : | : |
 | **HC-SR04 (Sensor)** | Trigger Pin (Output) | **D1 (GPIO 5)** | Output pulse for distance measurement. |
 | **HC-SR04 (Sensor)** | Echo Pin (Input) | **D2 (GPIO 4)** | Input pulse for distance calculation. |
 | **OLED Display** | SCL (Clock) | **D3 (GPIO 0)** | I2C Communication for display. |
@@ -90,7 +90,7 @@ The following diagram details the pin connections for the ESP8266, sensor, and o
 
 
 ### **5. Software Setup and Configuration**
----
+
 
 #### **5.1. Arduino IDE Setup**
 
@@ -159,7 +159,7 @@ Before uploading the firmware, ensure your Arduino IDE is configured correctly.
 
 
 ### **6. Application Showcase**
----
+
 
 The following *screenshots* demonstrate the successful execution and flow of the application from the hardware simulation to the final dashboard monitoring.
 
@@ -185,10 +185,10 @@ The server log confirms that the backend listener successfully received the mess
 
 
 ### **7. Video Documentation**
----
+
 
 For a complete, real-time demonstration of the system in action, including the moment a car is detected and the dashboard updates, please watch the following video:
 
-[![Youtube IoT Smart Parking Simulation Video]](https://www.youtube.com/shorts/WS5VSQtktnw) atau bisa dowload di  [Download video MP4](video/video.mp4)
+[!Youtube IoT Smart Parking Simulation Video](https://www.youtube.com/shorts/WS5VSQtktnw) atau bisa dowload di  [Download video MP4](video/video.mp4)
 
 
