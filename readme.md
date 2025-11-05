@@ -1,270 +1,188 @@
 
-# Voice Commnad IoT Lamp Control with ESP8266 and MQTT
+The primary problem in modern cities is inefficient parking management due to a lack of real-time information, which causes traffic congestion, wasted fuel, and stress for drivers searching for open spots.
 
-In a modern smart home, control needs to be fast and easy. Have you ever thought about controlling your devices just by speaking, from anywhere?
+ This project provides an IoT Smart Parking solution to fix this. It uses an ESP8266 and an Ultrasonic Sensor (HC-SR04) to automatically detect if a parking slot is occupied or empty. 
+ 
+ This status is then instantly sent using the efficient MQTT Protocol to a central server and a Frontend Dashboard. By giving users and operators immediate, accurate visibility of slot availability, the system aims to significantly reduce parking search time and optimize the overall use of the parking area.
 
-This project makes that possible. We connect the digital world (voice commands, web apps) with the physical world (lamps, relays) using simple, strong technology. By using the **ESP8266 microcontroller** and the **MQTT protocol**, we build a system that works quickly and reliably.
+### **Table of Contents**
 
-The main goal is to take an **ON/OFF command**—either from a web app or your voice—and execute it instantly on the hardware.
+1.  [Project Overview](https://github.com/dendie-sanjaya/iot-parking-lot#1--project-overview)
+2.  [Key Features and Technologies](https://github.com/dendie-sanjaya/iot-parking-lot#2--key-features-and-technologies)
+3.  [System Architecture (Overall Design)](https://github.com/dendie-sanjaya/iot-parking-lot#3--system-architecture-overall-design)
+      * [3.1. Architecture Diagram](https://github.com/dendie-sanjaya/iot-parking-lot#31-architecture-diagram)
+4.  [Hardware Components and Wiring](https://github.com/dendie-sanjaya/iot-parking-lot#4--hardware-components-and-wiring)
+      * [4.1. Wiring Diagram](https://github.com/dendie-sanjaya/iot-parking-lot#41-wiring-diagram)
+5.  [Software Setup and Configuration](https://github.com/dendie-sanjaya/iot-parking-lot#5--software-setup-and-configuration)
+      * [5.1. Arduino IDE Setup](https://github.com/dendie-sanjaya/iot-parking-lot#51-arduino-ide-setup)
+      * [5.2. Backend/Server Setup](https://github.com/dendie-sanjaya/iot-parking-lot#52-backendserver-setup)
+6.  [Application Showcase](https://github.com/dendie-sanjaya/iot-parking-lot#6--application-showcase)
+      * [6.1. Simulation Environment](https://github.com/dendie-sanjaya/iot-parking-lot#61-simulation-environment)
+      * [6.2. Frontend Dashboard Status](https://github.com/dendie-sanjaya/iot-parking-lot#62-frontend-dashboard-status)
+      * [6.3. Backend/Server Log (MQTT and API)](https://github.com/dendie-sanjaya/iot-parking-lot#63-backendserver-log-mqtt-and-api)
+7.  [Video Documentation](https://github.com/dendie-sanjaya/iot-parking-lot#7--video-documentation)
+8.  [License](https://github.com/dendie-sanjaya/iot-parking-lot#8--license)
 
-Have you ever imagined controlling your home devices from anywhere, just by sending a quick message?  
 
-This project brings that concept to life by connecting the **digital world** (applications, servers) and the **physical world** (lamps) using **NodeMCU ESP8266** and **MQTT (Message Queuing Telemetry Transport)**.
+### **1. Project Overview**
 
-Rreal-time system that receives ON/OFF commands from an external app (like our **Voice Command feature**), sends them through an MQTT broker, and makes the action happen right away on the ESP8266 hardware.
+This project is a detailed simulation of an **Internet of Things (IoT) Smart Parking System** designed to monitor a single parking slot's availability in real-time. It uses the **ESP8266** microcontroller, an **Ultrasonic Sensor (HC-SR04)**, and the **MQTT Protocol** to send status data to a custom-built **Frontend Dashboard**.
 
+This document serves as a complete guide, covering the architecture, hardware setup, software configuration, and a showcase of the running application.
 
-- [Voice Commnad IoT Lamp Control with ESP8266 and MQTT](#voice-commnad-iot-lamp-control-with-esp8266-and-mqtt)
-    - [Voice Command Feature](#voice-command-feature)
-  - [2. System Architecture](#2-system-architecture)
-    - [Communication Flow Diagram (Updated)](#communication-flow-diagram-updated)
-    - [Project Folder Structure (Updated)](#project-folder-structure-updated)
-  - [3. Hardware Requirements](#3-hardware-requirements)
-    - [Wiring Diagram (Schematic)](#wiring-diagram-schematic)
-  - [4. Software Requirements](#4-software-requirements)
-  - [5. Configuration and Deployment](#5-configuration-and-deployment)
-    - [5.1. MQTT Broker Deployment (Using Docker)](#51-mqtt-broker-deployment-using-docker)
-    - [5.2. Arduino Code Configuration (main.ino)](#52-arduino-code-configuration-mainino)
-    - [5.3. Upload to ESP8266](#53-upload-to-esp8266)
-    - [Relay Logic](#relay-logic)
-    - [5.4. MQTT Message Structure (Payload)](#54-mqtt-message-structure-payload)
-  - [7. Frontend Application](#7-frontend-application)
-  - [8. System Demonstration and Testing](#8-system-demonstration-and-testing)
-    - [A. Confirming ESP8266 Connection](#a-confirming-esp8266-connection)
-    - [B. Sending Commands from the Publisher (Backend App / MQTT Client)](#b-sending-commands-from-the-publisher-backend-app--mqtt-client)
-      - [**Option 1: Using Backend Server (Node.js + Express)**](#option-1-using-backend-server-nodejs--express)
-      - [**Option 2: Using MQTT Client (MQTT Explorer)**](#option-2-using-mqtt-client-mqtt-explorer)
-      - [**Option 3: Frontend Application**](#option-3-frontend-application)
-    - [C. Microcontroller Running Demo (Serial Monitor)](#c-microcontroller-running-demo-serial-monitor)
+### **2. Key Features and Technologies**
 
+| Feature | Component/Technology | Role in the System |
+| :--- | :--- | :--- |
+| **Object Sensing** | HC-SR04 Ultrasonic Sensor | **Detects** if a parking slot is **Occupied** (car present) or **Empty** (car absent). |
+| **Edge Computing** | ESP8266 Microcontroller | **Processes** sensor data, **Controls** local outputs (LEDs/OLED), and manages **Wi-Fi/MQTT** communication. |
+| **Local Status** | LED Lamp (Red/Green) & OLED Display | Provides immediate, local **visual feedback** to the user at the parking slot. |
+| **Cloud Communication** | MQTT Protocol (Pub/Sub) | Enables lightweight, **real-time data transmission** of the parking status to the central server. |
+| **Backend Data** | SQL Database, Node JS with RESTful API | **Stores** the latest status (`Info Status Slot Parkir`) and serves data to the Frontend Dashboard. |
+| **User Interface** | Frontend Dashboard (HTML/JS) | **Monitors** and visualizes the parking slot status centrally in a web browser. |
 
-### Voice Command Feature
 
-This feature lets the user send **ON** or **OFF** commands to the lamp simply by talking into the web application on their smartphone's browser.
 
-|| Component | Description |
-|------------|-------------|
-| **Voice Command App** | The web app (frontend) that captures the user's voice input. |
-| **Voice Processing** | The app translates the speech (e.g., “turn off the lamp”) into a text command: `ON` or `OFF`. |
-| **Communication** | The detected ON/OFF command is then sent to the NodeJS Server using a REST API (JSON). |
+### **3. System Architecture (Overall Design)**
 
-<p align="left">
-  <img src="ss/apps.jpg" alt="screen-shoot" width="300">
-</p>
+The system is based on a tiered IoT architecture, defining a clear data flow path from the physical environment to the user interface.
 
-## 2. System Architecture
 
-The system uses a **publish/subscribe (Pub/Sub)** model through an **MQTT Broker**, ensuring fast and reliable message delivery.
+#### **3.1. Architecture Diagram**
 
-###  Communication Flow Diagram (Updated)
+![Architecture Diagram](design/architecture.png)
 
-1. The Voice Command App hears the voice and detects the command (ON/OFF).  
-2. The command is sent over the Internet to the NodeJS Server using REST API (JSON).  
-3. The NodeJS Server (**Publisher**) sends the command to the MQTT Broker Server.  
-4. The ESP8266 Microcontroller (**Subscriber**) is connected via WiFi and the MQTT Protocol.  
-5. The ESP8266 executes the received command to control the lamp (Relay).
+The block diagram below illustrates the three main layers: Micro Controller, Internet/Broker, and Frontend Dashboard/Server.
 
-![screen-shoot](design/architecture.png)
+  * **Micro Controller Layer:** ESP8266 reads the Ultrasonic Sensor, updates the OLED/LED, and **Publishes** data.
+  * **Internet Layer:** The ESP8266 connects via **Wi-Fi** to the **MQTT Broker Server** (via IP Public / DNS) and sends the status.
+  * **Server Layer:** The **Backend Listener** (`listener.js`) **Subscribes** to the MQTT Topic, updates the **SQL Database** (`Update Status Slot Parkir`), and exposes the data via a **Restful API (JSON)**.
+  * **Frontend Layer:** The **Web Server (Apache/Nginx)** hosts the **Dashboard** (`index.html`) which fetches data from the API for **Monitoring**.
 
-![screen-shoot](design/flow.png)
 
-### Project Folder Structure (Updated)
 
-```
-.
-├── backend/
-│   ├── node_modules/
-│   ├── app.js
-│   ├── package-lock.json
-│   └── package.json
-├── frontend/
-│   └── index.html // Web app for Voice Command
-├── microcontroller/
-│   └── main/
-│       └── main.ino  // Arduino code for ESP8266
-└── README.md
-````
+### **4. Hardware Components and Wiring**
 
-| Folder/File | Description |
-|--|-|
-| **backend/app.js** | NodeJS Server: handles REST API requests and sends commands to the MQTT Broker. |
-| **frontend/index.html** | The Voice Command web app, used on a smartphone or browser. |
-| **microcontroller/main/main.ino** | Arduino code for ESP8266 (Subscriber) that receives and executes MQTT commands. |
+The following diagram details the pin connections for the ESP8266, sensor, and output modules.
 
 
-## 3. Hardware Requirements
+#### **4.1. Wiring Diagram**
 
-| Hardware Component | Description |
-|--|-|
-| **Microcontroller** | NodeMCU ESP8266  |
-| **Load** | LED Lamp or DC device |
+![Wiring Diagram](design/pin-wired.png)
 
-### Wiring Diagram (Schematic)
+| Component | Pin Function | ESP8266 Pin (NodeMCU) | Notes |
+| :--- | :--- | :--- | :--- |
+| **HC-SR04 (Sensor)** | Trigger Pin (Output) | **D1 (GPIO 5)** | Output pulse for distance measurement. |
+| **HC-SR04 (Sensor)** | Echo Pin (Input) | **D2 (GPIO 4)** | Input pulse for distance calculation. |
+| **OLED Display** | SCL (Clock) | **D3 (GPIO 0)** | I2C Communication for display. |
+| **OLED Display** | SDA (Data) | **D4 (GPIO 2)** | I2C Communication for display. |
+| **Red Lamp Module** | Control Pin | **D5 (GPIO 14)** | Active HIGH/LOW to indicate 'Occupied'. |
+| **Green Lamp Module** | Control Pin | **D6 (GPIO 12)** | Active HIGH/LOW to indicate 'Empty'. |
+| **Power** | Input | **DV 5V 1A (USB)** | Powers the ESP8266 and all connected components. |
 
-| ESP8266 Pin | Output Module Pin (Relay/LED) | Notes |
-|--|--|-|
-| D2 (GPIO 4) | IN | Relay Control Pin |
-| GND | GND | Ground |
-| 3V3 / 5V | VCC / USB Port | Powers the Relay/LED Module |
 
 
-![screen-shoot](design/pin-diagram.png)
+### **5. Software Setup and Configuration**
 
-## 4. Software Requirements
+#### **5.1. Arduino IDE Setup**
 
-- **Arduino IDE** – To upload code to the ESP8266  
-- **ESP8266 Board Support** – Install using *Board Manager* in Arduino IDE  
-- **Arduino Libraries** – `ESP8266WiFi`, `PubSubClient`, `ArduinoJson`  
-- **MQTT Broker** – Mosquitto / HiveMQ (local or containerized)  
-- **Apache / Nginx Web Server**   
+Before uploading the firmware, ensure your Arduino IDE is configured correctly.
 
-## 5. Configuration and Deployment
+1.  **Board Manager:** Install the **`esp8266`** boards package.
 
-### 5.1. MQTT Broker Deployment (Using Docker)
+![Screenshot Arduino IDE Setup](ss/5-arduino-preference.png)  
 
-```bash
-docker compose up -d
-````
+![Screenshot Arduino IDE Setup](ss/5-arduino-preference-2.png)  
 
-or
+![Screenshot Arduino IDE Setup](ss/5-arduino-preference-6.png)  
 
-```bash
-docker run -d --name mqtt-broker -p 1883:1883 hivemq/hivemq-ce
-```
+![Screenshot Arduino IDE Setup](ss/5-arduino-preference-7.png)  
 
-![ss](ss/1-run-server-mqtt.png)
+2.  **Required Libraries:** Install the following libraries via the Library Manager:
+      * `ESP8266WiFi`
+  
+![Screenshot Arduino IDE Setup](ss/5-arduino-preference-3.png)  
+ 
+      * `Adafruit SSD1306` (for OLED display)
 
-Broker will be available at:
+![Screenshot Arduino IDE Setup](ss/lead-display.png)  
 
-```
-mqtt://server-ip:1883
-```
+![Screenshot Arduino IDE Setup](ss/lead-display-2.png)  
 
+1.  **Code Configuration:**
+      * Set the correct **Wi-Fi credentials** (`SSID` and `PASSWORD`).
+      * Configure the **MQTT Broker IP Address/DNS** and **Topic**.
 
-### 5.2. Arduino Code Configuration (main.ino)
+![Screenshot Arduino IDE board and port settings for ESP8266](ss/arduiono-set-wifi-mqtt.png)
 
-Edit WiFi and MQTT details in `microcontroller/main/main.ino`:
+#### **5.2. Backend Server Setup**
 
-```cpp
-// REPLACE with your WiFi credentials
-const char* ssid = "APxxxx"; 
-const char* password = "Pxxxxxxx"; 
+1.  **MQTT Broker:** Install and run an MQTT Broker (e.g., Mosquitto). This serves as the communication hub.
+   
+![Screenshot of MQTT Broker running console/status](ss/3-mqtt-explorer.png)
 
-// REPLACE with your Local MQTT Broker IP
-const char* mqtt_server = "xxx.xxx.xxx.xx"; 
-const int mqtt_port = 1883;
-```
+2.  **Database Setup:** Create the necessary tables in your SQL database to store and manage the parking slot status.
+      For this experiment, we are using SQLite database. 
 
-### 5.3. Upload to ESP8266
+![Backend App Screenshot 1](ss/backend-app-1.png)
 
-1. Open `main.ino` in Arduino IDE
-2. Go to **Tools → Board → ESP8266 Boards → NodeMCU 1.0 (ESP-12E Module)**
-![ss](ss/5-arduino-preference-6.png)
+![Backend App Screenshot 3](ss/backend-app-3.png)
 
-![ss](ss/5-arduino-preference-7.png)
+![Backend App Screenshot 2](ss/backend-app-2.png)
 
-3. Select correct **COM Port**
+![Backend App Populate Data Screenshot 2](ss/backend-app-3-populate-data-2.png)
 
-4. Click **Upload (→)**
 
-![ss](ss/6-upload-code.png)
+3.  **Deploy Backend:** Deploy the Node.js/other backend files (`listener.js`, `app.js`).
+      * The **Listener** must be configured to **Subscribe** to the same MQTT Topic as the ESP8266 **Publishes** to.
 
-![ss](ss/6-upload-code-3.png)
+![Backend App Listener Screenshot](ss/backend-app-4-listener.png)
 
-![ss](ss/6-upload-code-4.png)
+      * The **API** should connect to the SQL Database to serve the current status to the dashboard.
 
+![Backend App Screenshot 5](ss/backend-app-5-app.png)
 
-### Relay Logic
+![Backend App API JSON Screenshot](ss/backend-app-5-api-json.png)
 
-The system uses an **ACTIVE-LOW** setting:
+    
+4.  **Web Server:** Configure and run your Web Server (Apache/Nginx) to host the Frontend Dashboard files (`index.html`).
 
-```cpp
-#define RELAY_ON LOW 
-#define RELAY_OFF HIGH
-```
+![XAMPP Screenshot](ss/xampp.png)
 
-### 5.4. MQTT Message Structure (Payload)
 
-| Command | JSON Payload        | Result         |
-| - | - | -- |
-| **ON**  | `{"status": "on"}`  | Lamp turns ON  |
-| **OFF** | `{"status": "off"}` | Lamp turns OFF |
+### **6. Application Showcase**
 
-**Topic used:** `lamp`
+The following *screenshots* demonstrate the successful execution and flow of the application from the hardware simulation to the final dashboard monitoring.
 
+#### **6.1. Simulation Environment**
 
-## 7. Frontend Application
+This visual shows the hardware running, with the sensor detecting a simulated object (car) and the local output indicators (LEDs & OLED) reacting.
 
-Voice command control integration allows users to send command,  
+![Hardware simulation running with car object detection](ss/simulation.jpg)
 
-Voice Input: User speaks a command (e.g., "Turn on Lamp").
-Voice Recognition: A Smart Assistant device or app recognizes the speect to text google chrome integrated with Google Speach to Text
-MQTT Bridge: A service translates the voice command into a text message and Publishes it to a dedicated MQTT command topic (e.g., pubs/lamp/).
-ESP8266 Action: The ESP8266, which Subscribes to the command topic, processes the request (e.g., reads the command on / off).
+#### **6.2. Frontend Dashboard Status**
 
-<p align="left">
-  <img src="ss/apps.jpg" alt="screen-shoot" width="300">
-</p>
+This is the final monitoring result displayed to the user/operator. It confirms that data is flowing correctly through the entire system stack (ESP8266 -\> MQTT -\> Listener -\> DB -\> API -\> Dashboard).
 
-## 8. System Demonstration and Testing
+![Frontend Dashboard displaying the current parking status](ss/frontend-1.png)
 
-### A. Confirming ESP8266 Connection
+![Frontend Dashboard displaying the current parking status](ss/frontend-2.png)
 
-After uploading, open the **Serial Monitor** at `115200 baud` to check WiFi and MQTT connection logs.
+#### **6.3. Backend/Server Log (MQTT and API)**
 
-### B. Sending Commands from the Publisher (Backend App / MQTT Client)
+The server log confirms that the backend listener successfully received the message from the MQTT Broker and processed the database update, showing the data payload.
 
-#### **Option 1: Using Backend Server (Node.js + Express)**
+![Backend server console running listener.js/app.js showing the received MQTT message](ss/backend-app-4-listener.png)
 
-Run the backend:
 
-```bash
-cd backend
-node app.js
-```
+### **7. Video Documentation**
 
-![ss](ss/2-run-server-backend.png)
+For a complete, real-time demonstration of the system in action, including the moment a car is detected and the dashboard updates, please watch the following video:
 
+[![Youtube IoT Smart Parking Simulation Video](ss/simulation.jpg)](https://www.youtube.com/shorts/WS5VSQtktnw)
 
-Send command via REST API:
+atau
 
-```bash
-POST http://localhost:4000/api/publish/lamp
-Content-Type: application/json
+[Download video MP4](video/video.mp4)
 
-{"status": "on"}
-```
 
-#### **Option 2: Using MQTT Client (MQTT Explorer)**
-
-* Connect to: `xx.xx.xx.xx:1883`
-* Publish to topic: `lamp`
-* Payload: `{"status":"on"}` or `{"status":"off"}`
-
-
-![ss](ss/3-mqtt-explorer.png)
-
-![ss](ss/4-publish-to-mqtt.png)
-
-
-#### **Option 3: Frontend Application**
-
-* Connect frontend application  via browser laptop / handphoe: `https://xx.xx.xx.xx:`
-* Send Command via voice 
-
-![screen-shoot](ss/demo.png)
-
-![screen-shoot](ss/lamp.png)
-
-![See & Download Video Demo](video/video.mp4)
-
-### C. Microcontroller Running Demo (Serial Monitor)
-
-When a command is received and processed, the Serial Monitor will show:
-
-```
-Connected to WiFi
-Connected to MQTT Broker
-Message received: {"status":"on"}
-Turning Lamp ON
-```
